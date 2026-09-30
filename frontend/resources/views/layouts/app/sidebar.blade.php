@@ -18,6 +18,14 @@
                     <flux:sidebar.item icon="document-arrow-up" :href="route('documents.upload')" :current="request()->routeIs('documents.upload')" wire:navigate>
                         {{ __('Documents') }}
                     </flux:sidebar.item>
+                    <flux:sidebar.item icon="magnifying-glass" :href="route('search')" :current="request()->routeIs('search')" wire:navigate>
+                        {{ __('AI Beleid Zoeker') }}
+                    </flux:sidebar.item>
+                    @if (auth()->user()?->isHr())
+                        <flux:sidebar.item icon="cog" :href="route('admin.documents')" :current="request()->routeIs('admin.documents')" wire:navigate>
+                            {{ __('HR Admin Portal') }}
+                        </flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 

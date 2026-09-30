@@ -13,6 +13,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/admin/documents', [DocumentController::class, 'admin'])->name('admin.documents');
     Route::get('/search', [DocumentController::class, 'search'])->name('search');
+    Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
+    Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+    Route::post('/documents/{document}/toggle-status', [DocumentController::class, 'toggleStatus'])->name('documents.toggle-status');
 });
 
 Route::post('/email/verification-notification', function (Request $request) {

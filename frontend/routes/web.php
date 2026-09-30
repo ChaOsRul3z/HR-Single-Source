@@ -7,6 +7,7 @@ Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', ShowDashboardController::class)->name('dashboard');
+    Route::livewire('documents', 'pages::documents.upload')->name('documents.upload');
 });
 
 Route::post('/email/verification-notification', function (Request $request) {

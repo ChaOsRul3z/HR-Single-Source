@@ -15,11 +15,6 @@ class DocumentController extends Controller
         ];
     }
 
-    public function admin()
-    {
-        return view('admin.documents', ['documents' => $this->mockDocuments()]);
-    }
-
     public function search(Request $request)
     {
         $q = strtolower($request->query('q', ''));

@@ -82,6 +82,7 @@ new #[Title('Documents')]
         }
 
         $this->reset('files');
+        $this->dispatch('documents-uploaded');
         Flux::toast(variant: 'success', text: __('All files uploaded and saved successfully.'));
     }
 
@@ -192,6 +193,7 @@ new #[Title('Documents')]
             </div>
         @endif
     </form>
+</section>
 
     <p class="text-center text-xs text-zinc-500">
         Identieke bestanden worden automatisch herkend en geweigerd, zodat er maar één bron van waarheid blijft.

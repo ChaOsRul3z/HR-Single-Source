@@ -70,7 +70,7 @@
             @endforeach
         </div>
 
-        <livewire:documents-table />
+        <livewire:documents-table :documents="$documents" />
 
     </div>
 </x-layouts::app>

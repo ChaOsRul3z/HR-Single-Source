@@ -83,7 +83,12 @@ new #[Title('Documents')]
         }
 
         $this->reset('files');
+<<<<<<< HEAD
         Flux::toast(variant: 'success', text: __(':count document(s) ingested into Single Source of Truth.', ['count' => $count]));
+=======
+        $this->dispatch('documents-uploaded');
+        Flux::toast(variant: 'success', text: __('All files uploaded and saved successfully.'));
+>>>>>>> c41d43415be9c02915e96f5df0ba22e0adfa31d1
     }
 
 }; ?>
@@ -147,4 +152,8 @@ new #[Title('Documents')]
             <flux:button type="submit" variant="primary" class="mt-4">{{ __('Upload') }}</flux:button>
         @endif
     </form>
+
+    <div class="mt-10">
+        <livewire:documents-table />
+    </div>
 </section>

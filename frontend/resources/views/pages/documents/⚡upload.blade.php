@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\File; // Make sure you have this model
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,10 +26,14 @@ new #[Title('Documents')]
     }
 
     /**
-     * Store the queued files.
+     * Store the queued files and save to the database.
      */
     public function save(): void
     {
+        // 1. Wipe away ALL old validation errors from prior attempts
+        $this->resetErrorBag();
+
+        // 2. Run basic structural validation
         $this->validate(
             rules: [
                 'files' => ['required', 'array', 'min:1', 'max:10'],
@@ -42,17 +47,46 @@ new #[Title('Documents')]
                 'files.*.max' => __('Each file may not be larger than 10MB.'),
             ],
         );
-        $path = 'documents/' . uniqid() . '.' . $this->files[0]->getClientOriginalExtension();
 
+        // 3. Pre-check files for duplicate hashes
+        foreach ($this->files as $index => $file) {
+            $hash = hash_file('sha256', $file->getRealPath());
+
+            if (File::where('file_hash', $hash)->exists()) {
+                // Attach error ONLY to this specific index
+                $this->addError("files.{$index}", __('This exact file document has already been uploaded previously.'));
+            }
+        }
+
+        // 4. If errors exist, stop and let Livewire re-render
+        if ($this->getErrorBag()->isNotEmpty()) {
+            Flux::toast(variant: 'danger', text: __('Upload halted: Duplicate files detected.'));
+            return;
+        }
+
+        // 5. Safe Zone: Process unique files
         foreach ($this->files as $file) {
-            Storage::disk('public')->put($path, $file->get());
+            $hash = hash_file('sha256', $file->getRealPath());
+            $originalName = $file->getClientOriginalName();
+            $filename = uniqid() . '_' . $originalName;
+
+            $path = $file->storeAs('documents', $filename, 'public');
+
+            File::create([
+                'original_name' => $originalName,
+                'storage_path'  => $path,
+                'size'          => $file->getSize(),
+                'mime_type'     => $file->getMimeType(),
+                'file_hash'     => $hash,
+            ]);
         }
 
         $this->reset('files');
-
-        Flux::toast(variant: 'success', text: __('Files uploaded.'));
+        Flux::toast(variant: 'success', text: __('All files uploaded and saved successfully.'));
     }
+
 }; ?>
+
 
 <section class="mx-auto w-full max-w-3xl">
     <div class="relative mb-6 w-full">
@@ -64,23 +98,26 @@ new #[Title('Documents')]
     </div>
 
     <form wire:submit="save">
-        <flux:file-upload wire:model="files" multiple label="Upload files">
+        <flux:file-upload wire:model="files" multiple label="Upload files" error:deep="false">
             <flux:file-upload.dropzone heading="Drop files here or click to browse"
-                text="PDF, DOC, DOCX, TXT up to 10MB (max 10 files)" with-progress />
+                text="PDF, DOC, DOCX, XLS, XLSX up to 10MB (max 10 files)" with-progress />
         </flux:file-upload>
-
-        <flux:error name="files" />
 
         <div class="mt-4 flex flex-col gap-2">
             @foreach ($files as $index => $file)
-                <flux:file-item wire:key="file-{{ $index }}" :heading="$file->getClientOriginalName()"
-                    :size="$file->getSize()" :invalid="$errors->has('files.'.$index)">
+                <!-- Important: Ensure wire:key is completely unique -->
+                <flux:file-item wire:key="file-item-{{ $index }}-{{ $file->getClientOriginalName() }}"
+                    :heading="$file->getClientOriginalName()"
+                    :size="$file->getSize()"
+                    :invalid="$errors->has('files.'.$index)">
+
                     <x-slot name="actions">
                         <flux:file-item.remove wire:click="removeFile({{ $index }})"
                             aria-label="{{ 'Remove file: ' . $file->getClientOriginalName() }}" />
                     </x-slot>
                 </flux:file-item>
 
+                <!-- 2. Targeted item index error (This is where the duplicate hash error drops) -->
                 <flux:error name="files.{{ $index }}" />
             @endforeach
         </div>

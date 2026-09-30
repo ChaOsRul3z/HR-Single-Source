@@ -119,7 +119,7 @@ class extends Component {
 }; ?>
 
 
-<section class="mx-auto w-full max-w-5xl">
+<section class="w-full">
     <div class="relative mb-6 w-full">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>

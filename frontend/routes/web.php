@@ -3,12 +3,17 @@
 use App\Http\Controllers\Dashboard\ShowDashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DocumentController;
+use Illuminate\Http\Request;
 
 Route::view('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', ShowDashboardController::class)->name('dashboard');
     Route::livewire('documents', 'pages::documents.upload')->name('documents.upload');
+
+    Route::get('/admin/documents', [DocumentController::class, 'admin'])->name('admin.documents');
+    Route::get('/search', [DocumentController::class, 'search'])->name('search');
 });
 
 Route::post('/email/verification-notification', function (Request $request) {

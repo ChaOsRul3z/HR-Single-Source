@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welkom · {{ config('app.name', 'HR Single Source') }}</title>
+    <title>{{ __('Welcome') }} · {{ config('app.name', 'HR Single Source') }}</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
@@ -22,14 +22,25 @@
             </a>
 
             <div class="flex items-center gap-3">
+                <flux:dropdown position="bottom" align="end">
+                    <flux:button size="sm" variant="ghost" icon="language" icon:trailing="chevron-down">{{ strtoupper(app()->getLocale()) }}</flux:button>
+
+                    <flux:menu>
+                        @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                            <flux:menu.item :href="LaravelLocalization::getLocalizedURL($localeCode, null, [], true)" :icon="app()->getLocale() === $localeCode ? 'check' : null" hreflang="{{ $localeCode }}">
+                                {{ $properties['native'] }}
+                            </flux:menu.item>
+                        @endforeach
+                    </flux:menu>
+                </flux:dropdown>
 
                 @auth
                     @if (Route::has('dashboard'))
-                        <flux:button :href="route('dashboard')" size="sm" icon="squares-2x2">Dashboard</flux:button>
+                        <flux:button :href="route('dashboard')" size="sm" icon="squares-2x2">{{ __('Dashboard') }}</flux:button>
                     @endif
                 @else
                     @if (Route::has('login'))
-                        <flux:button :href="route('login')" size="sm" variant="primary">Inloggen</flux:button>
+                        <flux:button :href="route('login')" size="sm" variant="primary">{{ __('Log in') }}</flux:button>
                     @endif
                 @endauth
             </div>
@@ -47,27 +58,27 @@
                     </span>
 
                     <h1 class="mt-6 text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-                        Al je HR-documenten op één plek.
+                        {{ __('All your HR documents in one place.') }}
                     </h1>
 
                     <p class="mt-5 max-w-xl text-lg text-white/70">
-                        Beleid, contracten en procedures: altijd de nieuwste versie, makkelijk te vinden en toegankelijk voor iedereen die ze nodig heeft.
+                        {{ __('Policies, contracts and procedures: always the latest version, easy to find and accessible to everyone who needs them.') }}
                     </p>
 
                     <div class="mt-9 flex flex-wrap gap-3">
                         @auth
                             @if (Route::has('documents.index'))
-                                <flux:button :href="route('documents.index')" variant="primary" icon-trailing="arrow-right">Documenten bekijken</flux:button>
+                                <flux:button :href="route('documents.index')" variant="primary" icon-trailing="arrow-right">{{ __('View documents') }}</flux:button>
                             @endif
                             @if (Route::has('dashboard'))
-                                <a href="{{ route('dashboard') }}" class="inline-flex h-10 items-center rounded-lg border border-white/20 px-4 text-sm font-medium text-white transition hover:bg-white/10">Naar dashboard</a>
+                                <a href="{{ route('dashboard') }}" class="inline-flex h-10 items-center rounded-lg border border-white/20 px-4 text-sm font-medium text-white transition hover:bg-white/10">{{ __('Go to dashboard') }}</a>
                             @endif
                         @else
                             @if (Route::has('login'))
-                                <flux:button :href="route('login')" variant="primary" icon-trailing="arrow-right">Inloggen</flux:button>
+                                <flux:button :href="route('login')" variant="primary" icon-trailing="arrow-right">{{ __('Log in') }}</flux:button>
                             @endif
                             @if (Route::has('documents.index'))
-                                <a href="{{ route('documents.index') }}" class="inline-flex h-10 items-center rounded-lg border border-white/20 px-4 text-sm font-medium text-white transition hover:bg-white/10">Documenten bekijken</a>
+                                <a href="{{ route('documents.index') }}" class="inline-flex h-10 items-center rounded-lg border border-white/20 px-4 text-sm font-medium text-white transition hover:bg-white/10">{{ __('View documents') }}</a>
                             @endif
                         @endauth
                     </div>
@@ -77,8 +88,8 @@
                 <div class="hidden lg:block" aria-hidden="true">
                     <div class="rounded-xl bg-white p-5 text-zinc-900 shadow-2xl shadow-black/30 dark:bg-zinc-900 dark:text-zinc-100">
                         <div class="mb-4 flex items-center justify-between">
-                            <span class="text-sm font-semibold">Documenten</span>
-                            <span class="rounded-md bg-brand-soft px-2 py-0.5 text-xs font-medium text-accent-content dark:bg-zinc-800 dark:text-accent">Actief</span>
+                            <span class="text-sm font-semibold">{{ __('Documents') }}</span>
+                            <span class="rounded-md bg-brand-soft px-2 py-0.5 text-xs font-medium text-accent-content dark:bg-zinc-800 dark:text-accent">{{ __('Active') }}</span>
                         </div>
                         @foreach ([
                             ['document-text', 'Arbeidsreglement', 'PDF'],
@@ -101,9 +112,9 @@
         {{-- Features --}}
         <section class="mx-auto grid max-w-6xl gap-4 px-6 py-16 md:grid-cols-3">
             @foreach ([
-                ['document-duplicate', 'Eén bron van waarheid', 'Nooit meer zoeken in mailboxen en gedeelde mappen. Elk HR-document staat hier.'],
-                ['arrow-path', 'Altijd up-to-date', 'Alleen actieve versies worden getoond, zodat iedereen met dezelfde informatie werkt.'],
-                ['shield-check', 'Toegang per rol', 'Vertrouwelijke documenten zijn alleen zichtbaar voor wie ze nodig heeft.'],
+                ['document-duplicate', __('One source of truth'), __('No more searching through mailboxes and shared folders. Every HR document lives here.')],
+                ['arrow-path', __('Always up to date'), __('Only active versions are shown, so everyone works with the same information.')],
+                ['shield-check', __('Role-based access'), __('Confidential documents are only visible to those who need them.')],
             ] as [$icon, $title, $text])
                 <div class="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
                     <span class="flex size-10 items-center justify-center rounded-lg bg-brand-soft text-accent dark:bg-zinc-900">
@@ -119,7 +130,7 @@
     <footer class="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div class="mx-auto flex max-w-6xl flex-wrap justify-between gap-4 px-6 py-6 text-sm text-zinc-500 dark:text-zinc-400">
             <span>&copy; {{ date('Y') }} {{ config('app.name', 'HR Single Source') }}</span>
-            <span>Vragen? Neem contact op met de HR-afdeling.</span>
+            <span>{{ __('Questions? Contact the HR department.') }}</span>
         </div>
     </footer>
 

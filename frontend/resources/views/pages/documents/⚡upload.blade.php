@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\File; // Make sure you have this model
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +26,7 @@ new #[Title('Documents')]
     }
 
     /**
-     * Store the queued files.
+     * Store the queued files and save to the database.
      */
     public function save(): void
     {
@@ -42,15 +43,26 @@ new #[Title('Documents')]
                 'files.*.max' => __('Each file may not be larger than 10MB.'),
             ],
         );
-        $path = 'documents/' . uniqid() . '.' . $this->files[0]->getClientOriginalExtension();
 
         foreach ($this->files as $file) {
-            Storage::disk('public')->put($path, $file->get());
+            $originalName = $file->getClientOriginalName();
+            $filename = uniqid() . '_' . $originalName;
+
+            // Store file in public disk
+            $path = $file->storeAs('documents', $filename, 'public');
+
+            // Save record to the database
+            File::create([
+                'name' => $originalName,
+                'path' => $path,
+                'size' => $file->getSize(),
+                'mime_type' => $file->getMimeType(),
+            ]);
         }
 
         $this->reset('files');
 
-        Flux::toast(variant: 'success', text: __('Files uploaded.'));
+        Flux::toast(variant: 'success', text: __('Files uploaded and saved successfully.'));
     }
 }; ?>
 
@@ -66,7 +78,7 @@ new #[Title('Documents')]
     <form wire:submit="save">
         <flux:file-upload wire:model="files" multiple label="Upload files">
             <flux:file-upload.dropzone heading="Drop files here or click to browse"
-                text="PDF, DOC, DOCX, TXT up to 10MB (max 10 files)" with-progress />
+                text="PDF, DOC, DOCX, XLS, XLSX up to 10MB (max 10 files)" with-progress />
         </flux:file-upload>
 
         <flux:error name="files" />

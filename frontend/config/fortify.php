@@ -161,7 +161,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Disabled: Public self-registration bypasses organizational membership control
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

@@ -1,9 +1,11 @@
 <?php
 
 use App\Models\File;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -11,6 +13,13 @@ use Livewire\WithPagination;
 new class extends Component
 {
     use WithPagination;
+
+    /**
+     * Documents passed in by the parent. When null, the table queries and paginates them itself.
+     *
+     * @var Collection<int, File>|null
+     */
+    public ?Collection $documents = null;
 
     #[Url(as: 'q')]
     public string $search = '';
@@ -43,16 +52,26 @@ new class extends Component
         $this->resetPage();
     }
 
+    #[On('documents-uploaded')]
+    public function refreshDocuments(): void
+    {
+        $this->resetPage();
+    }
+
     /**
-     * @return LengthAwarePaginator<int, File>
+     * @return Collection<int, File>|LengthAwarePaginator<int, File>
      */
     #[Computed]
-    public function documents(): LengthAwarePaginator
+    public function rows(): Collection|LengthAwarePaginator
     {
+        if ($this->documents !== null) {
+            return $this->documents;
+        }
+
         return File::query()
             ->when($this->search, fn ($query) => $query->where('original_name', 'like', '%'.$this->search.'%'))
             ->orderBy($this->sortBy, $this->sortDirection)
-            ->paginate(8);
+            ->paginate(10);
     }
 
     /**
@@ -73,29 +92,34 @@ new class extends Component
 <div class="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
     <div class="flex flex-col gap-4 border-b border-zinc-100 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
         <div>
-            <flux:heading size="lg">{{ __('Recente documenten') }}</flux:heading>
-            <flux:text>{{ trans_choice(':count document in de bron|:count documenten in de bron', $this->documents->total()) }}</flux:text>
+            <flux:heading size="lg">{{ $documents !== null ? __('Recente documenten') : __('Alle documenten') }}</flux:heading>
+            @if ($documents === null)
+                <flux:text>{{ trans_choice(':count document in de bron|:count documenten in de bron', $this->rows->total()) }}</flux:text>
+            @endif
         </div>
 
         <div class="flex items-center gap-2">
-            <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" size="sm" :placeholder="__('Zoek op bestandsnaam...')" clearable class="sm:w-64" />
-            <flux:button :href="route('documents.upload')" icon="arrow-up-tray" size="sm" variant="primary" wire:navigate>
-                {{ __('Upload') }}
-            </flux:button>
+            @if ($documents === null)
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" size="sm" :placeholder="__('Zoek op bestandsnaam...')" clearable class="sm:w-64" />
+            @else
+                <flux:button :href="route('documents.upload')" icon-trailing="arrow-right" size="sm" variant="primary" wire:navigate>
+                    {{ __('Bekijk alles') }}
+                </flux:button>
+            @endif
         </div>
     </div>
 
-    <flux:table :paginate="$this->documents" class="mt-2">
+    <flux:table :paginate="$documents === null ? $this->rows : null" class="mt-2">
         <flux:table.columns>
-            <flux:table.column sortable :sorted="$sortBy === 'original_name'" :direction="$sortDirection" wire:click="sort('original_name')">{{ __('Document') }}</flux:table.column>
+            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'original_name'" :direction="$sortDirection" wire:click="sort('original_name')">{{ __('Document') }}</flux:table.column>
             <flux:table.column>{{ __('Type') }}</flux:table.column>
-            <flux:table.column sortable :sorted="$sortBy === 'size'" :direction="$sortDirection" wire:click="sort('size')">{{ __('Grootte') }}</flux:table.column>
-            <flux:table.column sortable :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">{{ __('Geüpload') }}</flux:table.column>
+            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'size'" :direction="$sortDirection" wire:click="sort('size')">{{ __('Grootte') }}</flux:table.column>
+            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">{{ __('Geüpload') }}</flux:table.column>
             <flux:table.column></flux:table.column>
         </flux:table.columns>
 
         <flux:table.rows>
-            @forelse ($this->documents as $document)
+            @forelse ($this->rows as $document)
                 @php($extension = strtolower(pathinfo($document->original_name, PATHINFO_EXTENSION)))
 
                 <flux:table.row :key="$document->id">

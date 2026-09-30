@@ -82,6 +82,7 @@ new #[Title('Documents')]
         }
 
         $this->reset('files');
+        $this->dispatch('documents-uploaded');
         Flux::toast(variant: 'success', text: __('All files uploaded and saved successfully.'));
     }
 
@@ -126,4 +127,8 @@ new #[Title('Documents')]
             <flux:button type="submit" variant="primary" class="mt-4">{{ __('Upload') }}</flux:button>
         @endif
     </form>
+
+    <div class="mt-10">
+        <livewire:documents-table />
+    </div>
 </section>

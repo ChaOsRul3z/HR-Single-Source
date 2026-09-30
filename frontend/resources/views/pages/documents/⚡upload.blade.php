@@ -98,13 +98,10 @@ new #[Title('Documents')]
     </div>
 
     <form wire:submit="save">
-        <flux:file-upload wire:model="files" multiple label="Upload files">
+        <flux:file-upload wire:model="files" multiple label="Upload files" error:deep="false">
             <flux:file-upload.dropzone heading="Drop files here or click to browse"
                 text="PDF, DOC, DOCX, XLS, XLSX up to 10MB (max 10 files)" with-progress />
         </flux:file-upload>
-
-        <!-- 1. Global upload error (e.g., "Select at least one file") -->
-        <flux:error name="files" />
 
         <div class="mt-4 flex flex-col gap-2">
             @foreach ($files as $index => $file)

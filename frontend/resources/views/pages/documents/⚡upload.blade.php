@@ -119,8 +119,8 @@ class extends Component {
 }; ?>
 
 
-<section class="mx-auto w-full max-w-5xl">
-    <div class="relative mb-6 w-full">
+<section class="w-full">
+    <div class="flex w-full flex-1 flex-col gap-8 font-sans antialiased text-zinc-900 dark:text-zinc-100">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <flux:heading size="xl" level="1">{{ __('Documents') }}</flux:heading>

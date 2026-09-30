@@ -83,12 +83,8 @@ new #[Title('Documents')]
         }
 
         $this->reset('files');
-<<<<<<< HEAD
-        Flux::toast(variant: 'success', text: __(':count document(s) ingested into Single Source of Truth.', ['count' => $count]));
-=======
         $this->dispatch('documents-uploaded');
         Flux::toast(variant: 'success', text: __('All files uploaded and saved successfully.'));
->>>>>>> c41d43415be9c02915e96f5df0ba22e0adfa31d1
     }
 
 }; ?>
@@ -113,7 +109,6 @@ new #[Title('Documents')]
         </div>
     </div>
 
-<<<<<<< HEAD
     <form wire:submit="save" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -139,93 +134,6 @@ new #[Title('Documents')]
             <flux:file-upload.dropzone heading="Drop files here or click to browse"
                 text="PDF, DOC, DOCX, XLS, XLSX, TXT, MD up to 10MB (max 10 files)" with-progress />
         </flux:file-upload>
-=======
-    {{-- Upload --}}
-    <form wire:submit="save"
-          class="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
->>>>>>> 428235c8af0f3fb8c52d30a59a3af5eb4d3f1a12
-
-        <div x-data="{ over: false }"
-             @dragover.prevent="over = true"
-             @dragleave.prevent="over = false"
-             @drop="over = false"
-             :class="over ? 'border-blue-600 bg-blue-50 dark:bg-blue-950/30' : 'border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-950'"
-             class="relative flex flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-14 text-center transition">
-
-            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
-                <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V4m0 0L7 9m5-5 5 5M5 14v5h14v-5" />
-                </svg>
-            </div>
-
-            <p class="mt-4 text-base font-semibold text-zinc-900 dark:text-white">
-                Sleep bestanden hierheen of klik om te bladeren
-            </p>
-            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                PDF, DOC, DOCX, XLS en XLSX tot 10 MB (maximaal 10 bestanden)
-            </p>
-
-            <div wire:loading wire:target="files" class="mt-4 text-sm font-medium text-blue-600 dark:text-blue-400">
-                Bestanden worden geladen…
-            </div>
-
-            <input type="file" wire:model="files" multiple
-                   accept=".pdf,.doc,.docx,.xls,.xlsx"
-                   class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                   aria-label="Kies bestanden om te uploaden">
-        </div>
-
-        @error('files')
-            <p class="mt-3 text-sm font-medium text-red-600">{{ $message }}</p>
-        @enderror
-
-        {{-- Wachtrij --}}
-        @if (count($files) > 0)
-            <div class="mt-6 space-y-3">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-zinc-400">
-                    Klaar om te uploaden ({{ count($files) }})
-                </h2>
-
-                @foreach ($files as $index => $file)
-                    <div wire:key="file-item-{{ $index }}-{{ $file->getClientOriginalName() }}">
-                        <div class="flex items-center gap-3 rounded-xl border p-3 {{ $errors->has('files.'.$index) ? 'border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/30' : 'border-zinc-200 dark:border-zinc-800' }}">
-                            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 3.75h7l5 5v11.5H7a2 2 0 0 1-2-2v-12.5a2 2 0 0 1 2-2ZM14 4v5h5M9 14h6M9 17h6" />
-                                </svg>
-                            </span>
-
-                            <div class="min-w-0 flex-1">
-                                <p class="truncate text-sm font-medium text-zinc-900 dark:text-white">{{ $file->getClientOriginalName() }}</p>
-                                <p class="text-xs text-zinc-500">{{ \Illuminate\Support\Number::fileSize($file->getSize()) }}</p>
-                            </div>
-
-                            <button type="button" wire:click="removeFile({{ $index }})"
-                                    class="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-100 hover:text-red-600 dark:hover:bg-zinc-800"
-                                    aria-label="Verwijder {{ $file->getClientOriginalName() }}">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-
-                        @error('files.'.$index)
-                            <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="mt-6 flex justify-end">
-                <button type="submit"
-                        class="inline-flex items-center gap-2 rounded-full bg-[#008963] px-7 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#00B563] disabled:opacity-60"
-                        wire:loading.attr="disabled" wire:target="save">
-                    <span wire:loading.remove wire:target="save">Uploaden</span>
-                    <span wire:loading wire:target="save">Bezig…</span>
-                </button>
-            </div>
-        @endif
-    </form>
 </section>
 
     <p class="text-center text-xs text-zinc-500">

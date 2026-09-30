@@ -94,6 +94,3 @@ php artisan serve
 * **Filtering**: Use the department and status dropdowns at the top of the console to narrow down the active repository.
 * **Archiving**: Toggle document statuses directly from the data table action column.
 
----
-
-### Need any additional adjustments to the documentation or setup steps?

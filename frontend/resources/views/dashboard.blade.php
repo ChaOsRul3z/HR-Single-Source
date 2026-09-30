@@ -70,44 +70,7 @@
             @endforeach
         </div>
 
-        <!-- Recent Documents Table -->
-        <div class="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <div class="flex items-center justify-between pb-4 border-b border-zinc-100 dark:border-zinc-800">
-                <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">Recente documenten & versiebeheer</h2>
-                <span class="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-3 py-1 rounded-full">Live Sync</span>
-            </div>
-
-            <div class="overflow-x-auto mt-4">
-                <table class="w-full text-left text-sm">
-                    <thead class="text-xs uppercase tracking-wider text-zinc-400">
-                        <tr>
-                            <th class="py-3 font-semibold">Titel</th>
-                            <th class="py-3 font-semibold">Type</th>
-                            <th class="py-3 font-semibold">Grootte</th>
-                            <th class="py-3 font-semibold">Geüpload</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800/60">
-                        @forelse ($recent as $d)
-                            <tr class="transition hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
-                                <td class="py-4 font-medium text-zinc-900 dark:text-white">{{ $d->original_name }}</td>
-                                <td class="py-4">
-                                    <flux:badge size="sm" color="blue">{{ strtoupper(pathinfo($d->original_name, PATHINFO_EXTENSION)) }}</flux:badge>
-                                </td>
-                                <td class="py-4 font-mono text-xs text-zinc-500">{{ $d->readable_size }}</td>
-                                <td class="py-4 text-zinc-600 dark:text-zinc-300">{{ $d->created_at->format('d-m-Y H:i') }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="4" class="py-8 text-center text-zinc-500">
-                                    Nog geen documenten geladen in het systeem.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <livewire:documents-table />
 
     </div>
 </x-layouts::app>

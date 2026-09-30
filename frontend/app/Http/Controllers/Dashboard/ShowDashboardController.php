@@ -18,7 +18,6 @@ class ShowDashboardController extends Controller
             'activeCount' => File::count(),
             'archivedCount' => 0,
             'lastUpdated' => File::max('created_at'),
-            'recent' => File::latest()->limit(10)->get(),
         ]);
     }
 }

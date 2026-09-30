@@ -92,18 +92,18 @@ new class extends Component
 <div class="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
     <div class="flex flex-col gap-4 border-b border-zinc-100 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
         <div>
-            <flux:heading size="lg">{{ $documents !== null ? __('Recente documenten') : __('Alle documenten') }}</flux:heading>
+            <flux:heading size="lg">{{ $documents !== null ? __('Recent documents') : __('All documents') }}</flux:heading>
             @if ($documents === null)
-                <flux:text>{{ trans_choice(':count document in de bron|:count documenten in de bron', $this->rows->total()) }}</flux:text>
+                <flux:text>{{ trans_choice(':count document in the source|:count documents in the source', $this->rows->total()) }}</flux:text>
             @endif
         </div>
 
         <div class="flex items-center gap-2">
             @if ($documents === null)
-                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" size="sm" :placeholder="__('Zoek op bestandsnaam...')" clearable class="sm:w-64" />
+                <flux:input wire:model.live.debounce.300ms="search" icon="magnifying-glass" size="sm" :placeholder="__('Search by file name...')" clearable class="sm:w-64" />
             @else
                 <flux:button :href="route('documents.upload')" icon-trailing="arrow-right" size="sm" variant="primary" wire:navigate>
-                    {{ __('Bekijk alles') }}
+                    {{ __('View all') }}
                 </flux:button>
             @endif
         </div>
@@ -113,8 +113,8 @@ new class extends Component
         <flux:table.columns>
             <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'original_name'" :direction="$sortDirection" wire:click="sort('original_name')">{{ __('Document') }}</flux:table.column>
             <flux:table.column>{{ __('Type') }}</flux:table.column>
-            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'size'" :direction="$sortDirection" wire:click="sort('size')">{{ __('Grootte') }}</flux:table.column>
-            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">{{ __('Geüpload') }}</flux:table.column>
+            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'size'" :direction="$sortDirection" wire:click="sort('size')">{{ __('Size') }}</flux:table.column>
+            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'created_at'" :direction="$sortDirection" wire:click="sort('created_at')">{{ __('Uploaded') }}</flux:table.column>
             <flux:table.column></flux:table.column>
         </flux:table.columns>
 
@@ -161,7 +161,7 @@ new class extends Component
                     <flux:table.cell colspan="5">
                         <div class="flex flex-col items-center gap-2 py-10 text-center">
                             <flux:icon name="folder-open" class="text-zinc-400" />
-                            <flux:text>{{ $search ? __('Geen documenten gevonden voor ":search".', ['search' => $search]) : __('Nog geen documenten geladen in het systeem.') }}</flux:text>
+                            <flux:text>{{ $search ? __('No documents found for ":search".', ['search' => $search]) : __('No documents in the system yet.') }}</flux:text>
                         </div>
                     </flux:table.cell>
                 </flux:table.row>

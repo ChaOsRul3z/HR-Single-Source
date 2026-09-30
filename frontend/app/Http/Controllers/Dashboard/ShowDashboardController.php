@@ -21,14 +21,14 @@ class ShowDashboardController extends Controller
         $activeCount = (clone $baseQuery)->active()->count();
         $archivedCount = (clone $baseQuery)->archived()->count();
         $lastUpdated = (clone $baseQuery)->latest('updated_at')->value('updated_at');
-        $recent = (clone $baseQuery)->latest('updated_at')->take(5)->get();
+        $recent = (clone $baseQuery)->latest('updated_at')->take(2)->get();
 
         return view('dashboard', [
             'activeCount' => $activeCount,
             'archivedCount' => $archivedCount,
             'lastUpdated' => $lastUpdated,
             'recent' => $recent,
-            'documents' => Document::latest()->take(2)->get(),
+            'documents' => $recent,
         ]);
     }
 }

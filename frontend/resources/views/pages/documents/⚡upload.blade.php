@@ -146,9 +146,9 @@ class extends Component {
                 <flux:text class="mt-2">{{ __('Duplicate files are detected automatically.') }}</flux:text>
             </div>
 
-            <flux:file-upload wire:model="files" multiple label="Upload files" error:deep="false">
-                <flux:file-upload.dropzone heading="Drop files here or click to browse"
-                    text="PDF, DOC, DOCX, XLS, XLSX up to 10MB (max 10 files)" with-progress />
+            <flux:file-upload wire:model="files" multiple :label="__('Upload files')" error:deep="false">
+                <flux:file-upload.dropzone :heading="__('Drop files here or click to browse')"
+                    :text="__('PDF, DOC, DOCX, XLS, XLSX up to 10MB (max 10 files)')" with-progress />
             </flux:file-upload>
 
             @if ($files)
@@ -160,7 +160,7 @@ class extends Component {
                             :invalid="$errors->has('files.'.$index)">
                             <x-slot name="actions">
                                 <flux:file-item.remove wire:click="removeFile({{ $index }})"
-                                    aria-label="{{ 'Remove file: ' . $file->getClientOriginalName() }}" />
+                                    :aria-label="__('Remove file: :name', ['name' => $file->getClientOriginalName()])" />
                             </x-slot>
                         </flux:file-item>
 

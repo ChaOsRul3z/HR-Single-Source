@@ -117,11 +117,11 @@ new class extends Component
     <flux:table :paginate="$documents === null ? $this->rows : null" class="mt-2">
         <flux:table.columns>
             <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'title'" :direction="$sortDirection" wire:click="sort('title')">{{ __('Title') }}</flux:table.column>
-            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'department'" :direction="$sortDirection" wire:click="sort('department')">{{ __('Department') }}</flux:table.column>
-            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'version'" :direction="$sortDirection" wire:click="sort('version')">{{ __('Version') }}</flux:table.column>
+            <flux:table.column class="max-md:hidden" :sortable="$documents === null" :sorted="$sortBy === 'department'" :direction="$sortDirection" wire:click="sort('department')">{{ __('Department') }}</flux:table.column>
+            <flux:table.column class="max-lg:hidden" :sortable="$documents === null" :sorted="$sortBy === 'version'" :direction="$sortDirection" wire:click="sort('version')">{{ __('Version') }}</flux:table.column>
             <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'status'" :direction="$sortDirection" wire:click="sort('status')">{{ __('Status') }}</flux:table.column>
-            <flux:table.column>{{ __('File') }}</flux:table.column>
-            <flux:table.column :sortable="$documents === null" :sorted="$sortBy === 'updated_at'" :direction="$sortDirection" wire:click="sort('updated_at')">{{ __('Updated') }}</flux:table.column>
+            <flux:table.column class="max-lg:hidden">{{ __('File') }}</flux:table.column>
+            <flux:table.column class="max-sm:hidden" :sortable="$documents === null" :sorted="$sortBy === 'updated_at'" :direction="$sortDirection" wire:click="sort('updated_at')">{{ __('Updated') }}</flux:table.column>
             <flux:table.column></flux:table.column>
         </flux:table.columns>
 
@@ -136,15 +136,15 @@ new class extends Component
                                 <flux:icon :name="$document->is_restricted ? 'lock-closed' : 'document-text'" variant="mini" class="text-zinc-500 dark:text-zinc-300" />
                             </div>
                             <div class="min-w-0">
-                                <a href="{{ route('documents.show', $document) }}" class="block max-w-64 truncate font-medium text-zinc-900 hover:underline dark:text-white">{{ $document->title }}</a>
+                                <a href="{{ route('documents.show', $document) }}" class="block max-w-40 truncate sm:max-w-64 xl:max-w-md font-medium text-zinc-900 hover:underline dark:text-white">{{ $document->title }}</a>
                                 <span class="font-mono text-xs text-zinc-500">{{ $document->document_code }}</span>
                             </div>
                         </div>
                     </flux:table.cell>
 
-                    <flux:table.cell>{{ $document->department }}</flux:table.cell>
+                    <flux:table.cell class="max-md:hidden">{{ $document->department }}</flux:table.cell>
 
-                    <flux:table.cell class="font-mono text-xs">v{{ $document->version }}</flux:table.cell>
+                    <flux:table.cell class="font-mono text-xs max-lg:hidden">v{{ $document->version }}</flux:table.cell>
 
                     <flux:table.cell>
                         <flux:badge size="sm" :color="$document->isActive() ? 'green' : 'zinc'" inset="top bottom">
@@ -152,7 +152,7 @@ new class extends Component
                         </flux:badge>
                     </flux:table.cell>
 
-                    <flux:table.cell>
+                    <flux:table.cell class="max-lg:hidden">
                         @if ($document->file)
                             <div class="flex items-center gap-2">
                                 <flux:badge size="sm" :color="$this->extensionColor($extension)" inset="top bottom">{{ strtoupper($extension) }}</flux:badge>
@@ -163,7 +163,7 @@ new class extends Component
                         @endif
                     </flux:table.cell>
 
-                    <flux:table.cell>
+                    <flux:table.cell class="max-sm:hidden">
                         <flux:tooltip :content="$document->updated_at->format('d-m-Y H:i')">
                             <span>{{ $document->updated_at->diffForHumans() }}</span>
                         </flux:tooltip>

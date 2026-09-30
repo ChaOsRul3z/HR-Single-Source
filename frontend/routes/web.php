@@ -11,7 +11,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', ShowDashboardController::class)->name('dashboard');
     Route::livewire('documents', 'pages::documents.upload')->name('documents.upload');
 
-    Route::get('/admin/documents', [DocumentController::class, 'admin'])->name('admin.documents');
+    Route::livewire('/documents/overview', 'pages::documents.index')->name('documents.overview');
     Route::get('/search', [DocumentController::class, 'search'])->name('search');
     Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
     Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');

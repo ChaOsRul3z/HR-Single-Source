@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\File; // Make sure you have this model
+use App\Models\File;
+use App\Services\DocumentIngestionService;
 use Flux\Flux;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -14,6 +14,10 @@ new #[Title('Documents')]
 
     /** @var array<int, UploadedFile> */
     public array $files = [];
+
+    public string $department = 'HR';
+
+    public bool $is_restricted = false;
 
     /**
      * Remove a file from the upload queue.
@@ -26,64 +30,65 @@ new #[Title('Documents')]
     }
 
     /**
-     * Store the queued files and save to the database.
+     * Store the queued files, extract intelligence, and save to the single source repository.
      */
     public function save(): void
     {
-        // 1. Wipe away ALL old validation errors from prior attempts
         $this->resetErrorBag();
 
-        // 2. Run basic structural validation
         $this->validate(
             rules: [
                 'files' => ['required', 'array', 'min:1', 'max:10'],
-                'files.*' => ['file', 'mimes:pdf,doc,docx,xls,xlsx', 'min:1', 'max:10240'],
+                'files.*' => ['file', 'mimes:pdf,doc,docx,xls,xlsx,txt,md', 'min:1', 'max:10240'],
+                'department' => ['required', 'string', 'max:50'],
             ],
             messages: [
                 'files.required' => __('Select at least one file.'),
                 'files.max' => __('You can upload up to 10 files at once.'),
-                'files.*.mimes' => __('Only PDF, DOC, DOCX, XLS and XLSX files are allowed.'),
+                'files.*.mimes' => __('Only PDF, DOC, DOCX, XLS, XLSX, TXT and MD files are allowed.'),
                 'files.*.min' => __('The file is empty.'),
                 'files.*.max' => __('Each file may not be larger than 10MB.'),
             ],
         );
 
-        // 3. Pre-check files for duplicate hashes
+        // Pre-check files for duplicate hashes
         foreach ($this->files as $index => $file) {
             $hash = hash_file('sha256', $file->getRealPath());
 
             if (File::where('file_hash', $hash)->exists()) {
-                // Attach error ONLY to this specific index
                 $this->addError("files.{$index}", __('This exact file document has already been uploaded previously.'));
             }
         }
 
-        // 4. If errors exist, stop and let Livewire re-render
         if ($this->getErrorBag()->isNotEmpty()) {
             Flux::toast(variant: 'danger', text: __('Upload halted: Duplicate files detected.'));
             return;
         }
 
-        // 5. Safe Zone: Process unique files
+        /** @var DocumentIngestionService $ingestionService */
+        $ingestionService = app(DocumentIngestionService::class);
+        $user = auth()->user();
+
+        $count = 0;
         foreach ($this->files as $file) {
-            $hash = hash_file('sha256', $file->getRealPath());
-            $originalName = $file->getClientOriginalName();
-            $filename = uniqid() . '_' . $originalName;
-
-            $path = $file->storeAs('documents', $filename, 'public');
-
-            File::create([
-                'original_name' => $originalName,
-                'storage_path'  => $path,
-                'size'          => $file->getSize(),
-                'mime_type'     => $file->getMimeType(),
-                'file_hash'     => $hash,
-            ]);
+            $ingestionService->ingestUploadedFile(
+                $file,
+                $user,
+                [
+                    'department' => $this->department,
+                    'is_restricted' => $this->is_restricted,
+                ]
+            );
+            $count++;
         }
 
         $this->reset('files');
+<<<<<<< HEAD
+        Flux::toast(variant: 'success', text: __(':count document(s) ingested into Single Source of Truth.', ['count' => $count]));
+=======
         $this->dispatch('documents-uploaded');
         Flux::toast(variant: 'success', text: __('All files uploaded and saved successfully.'));
+>>>>>>> c41d43415be9c02915e96f5df0ba22e0adfa31d1
     }
 
 }; ?>
@@ -108,9 +113,37 @@ new #[Title('Documents')]
         </div>
     </div>
 
+<<<<<<< HEAD
+    <form wire:submit="save" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="department" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Afdeling / Department</label>
+                <select id="department" wire:model="department" class="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 shadow-sm focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900 dark:text-white">
+                    <option value="HR">HR (Human Resources)</option>
+                    <option value="Legal">Legal & Compliance</option>
+                    <option value="Finance">Finance & Payroll</option>
+                    <option value="Operations">Operations & IT</option>
+                </select>
+            </div>
+            <div class="flex items-center pt-6">
+                <label class="relative flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" wire:model="is_restricted" class="h-4 w-4 rounded border-zinc-300 text-blue-600 focus:ring-blue-500 dark:border-zinc-700 dark:bg-zinc-900">
+                    <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                        Vertrouwelijk document (HR / Admin restrictie)
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <flux:file-upload wire:model="files" multiple label="Upload files" error:deep="false">
+            <flux:file-upload.dropzone heading="Drop files here or click to browse"
+                text="PDF, DOC, DOCX, XLS, XLSX, TXT, MD up to 10MB (max 10 files)" with-progress />
+        </flux:file-upload>
+=======
     {{-- Upload --}}
     <form wire:submit="save"
           class="rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+>>>>>>> 428235c8af0f3fb8c52d30a59a3af5eb4d3f1a12
 
         <div x-data="{ over: false }"
              @dragover.prevent="over = true"

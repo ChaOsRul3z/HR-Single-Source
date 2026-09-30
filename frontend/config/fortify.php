@@ -161,7 +161,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Disabled: HR system requires admin-provisioned accounts
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([

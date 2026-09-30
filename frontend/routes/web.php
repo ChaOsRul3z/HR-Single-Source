@@ -1,33 +1,41 @@
 <?php
 
 use App\Http\Controllers\Dashboard\ShowDashboardController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DocumentController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Livewire\Livewire;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
-Route::view('/', 'welcome')->name('home');
+Route::prefix(LaravelLocalization::setLocale())
+    ->middleware(['localeSessionRedirect', 'localizationRedirect'])
+    ->group(function () {
+        Livewire::setUpdateRoute(fn ($handle, $path) => Route::post($path, $handle));
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', ShowDashboardController::class)->name('dashboard');
-    Route::livewire('documents', 'pages::documents.upload')->name('documents.upload');
-    Route::get('/admin/documents', [DocumentController::class, 'admin'])->name('admin.documents');
-    Route::livewire('/documents/overview', 'pages::documents.index')->name('documents.overview');
-    Route::get('/search', [DocumentController::class, 'search'])->name('search');
-    Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
-    Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
-    Route::post('/documents/{document}/toggle-status', [DocumentController::class, 'toggleStatus'])->name('documents.toggle-status');
-});
+        Route::view('/', 'welcome')->name('home');
 
-Route::post('/email/verification-notification', function (Request $request) {
-    // Check if user is already verified
-    if ($request->user()->hasVerifiedEmail()) {
-        return redirect()->intended('/dashboard');
-    }
+        Route::middleware(['auth', 'verified'])->group(function () {
+            Route::get('dashboard', ShowDashboardController::class)->name('dashboard');
+            Route::livewire('documents', 'pages::documents.upload')->name('documents.upload');
+            Route::get('/admin/documents', [DocumentController::class, 'admin'])->name('admin.documents');
+            Route::livewire('/documents/overview', 'pages::documents.index')->name('documents.overview');
+            Route::get('/search', [DocumentController::class, 'search'])->name('search');
+            Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
+            Route::get('/documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+            Route::post('/documents/{document}/toggle-status', [DocumentController::class, 'toggleStatus'])->name('documents.toggle-status');
+        });
 
-    // Resend the notification
-    $request->user()->sendEmailVerificationNotification();
+        Route::post('/email/verification-notification', function (Request $request) {
+            // Check if user is already verified
+            if ($request->user()->hasVerifiedEmail()) {
+                return redirect()->intended('/dashboard');
+            }
 
-    return back()->with('status', 'verification-link-sent');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+            // Resend the notification
+            $request->user()->sendEmailVerificationNotification();
 
-require __DIR__.'/settings.php';
+            return back()->with('status', 'verification-link-sent');
+        })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+        require __DIR__.'/settings.php';
+    });

@@ -68,6 +68,13 @@
                         <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
                             {{ __('Settings') }}
                         </flux:menu.item>
+                        <flux:menu.submenu :heading="__('Language')" icon="language">
+                            @foreach (LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+                                <flux:menu.item :href="LaravelLocalization::getLocalizedURL($localeCode, null, [], true)" :icon="app()->getLocale() === $localeCode ? 'check' : null" hreflang="{{ $localeCode }}">
+                                    {{ $properties['native'] }}
+                                </flux:menu.item>
+                            @endforeach
+                        </flux:menu.submenu>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />

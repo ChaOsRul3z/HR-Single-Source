@@ -161,7 +161,10 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Security: Public self-registration disabled to prevent unauthorized access
+        // to internal HR documents. User accounts must be provisioned by administrators
+        // to ensure only verified employees can access the document portal.
+        // Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([
